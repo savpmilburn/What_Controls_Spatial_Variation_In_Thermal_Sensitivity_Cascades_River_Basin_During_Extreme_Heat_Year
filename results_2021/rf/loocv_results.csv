@@ -1,0 +1,2 @@
+model,n_predictors,training_rmse,training_r2,loocv_rmse,loocv_r2
+RF,40,0.069,0.7682,0.0694,0.7625

@@ -1,5 +1,0 @@
-covariate,n_folds_selected,folds,in_published_model
-lakes_upstream_pct,1,Fold1,FALSE
-high_cascades_buffer_pct,2,"Fold1, Fold5",FALSE
-high_cascades_upstream_pct,3,"Fold2, Fold3, Fold4",TRUE
-channel_slope,1,Fold3,TRUE

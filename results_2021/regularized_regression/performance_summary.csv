@@ -1,0 +1,8 @@
+method,lambda_type,pooled_r2,pool
+ridge,min,0.7060679599437738,39_covariate
+ridge,1se,0.6178195335899288,39_covariate
+lasso,min,0.7259501859352515,39_covariate
+lasso,1se,0.6215273689989043,39_covariate
+elastic_net,min,0.7285987375489287,39_covariate
+elastic_net,1se,0.641951399757599,39_covariate
+ols_unregularized,NA,-1.0946545406263568,39_covariate

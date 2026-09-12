@@ -1,0 +1,4 @@
+model,best_structure,AIC,tailup,taildown,euclid,rank_pseudo_r2,rank_total_spatial_de,range_flag,matches_previous_selection
+Model1,epa_none_jbessel,-141.2897943095331,epa,none,jbessel,2,16,FALSE,FALSE
+Model2,epa_none_jbessel,-140.6976253846302,epa,none,jbessel,7,27,FALSE,FALSE
+Model3,epa_none_jbessel,-150.02070018423976,epa,none,jbessel,3,31,FALSE,FALSE

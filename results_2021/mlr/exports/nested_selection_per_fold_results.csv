@@ -1,6 +1,0 @@
-fold,n_after_vif,n_after_corr,n_regsubsets,n_significant,covariates_selected,held_out_rmse,held_out_r2
-Fold1,6,5,3,2,lakes_upstream_pct; high_cascades_buffer_pct,0.13775051239561184,0.2667953700492589
-Fold2,2,2,1,1,high_cascades_upstream_pct,0.09921954339358866,0.4053294870033244
-Fold3,6,5,2,2,channel_slope; high_cascades_upstream_pct,0.09608457373108752,0.5272963733850503
-Fold4,12,8,3,1,high_cascades_upstream_pct,0.08024918334195172,0.5771159807063275
-Fold5,6,5,4,1,high_cascades_buffer_pct,0.14849442723282275,0.07873730143310165

@@ -1,0 +1,4 @@
+model,n_predictors,aic,aic_type,training_rmse,training_r2,loocv_rmse,loocv_r2
+SSN_Model1,5,-141.1757,Exact Gaussian AIC (stats::AIC on full-sample ssn_lm ML/REML fit),0.0702,0.7566,0.0583,0.833
+SSN_Model2,5,-140.5501,Exact Gaussian AIC (stats::AIC on full-sample ssn_lm ML/REML fit),0.0679,0.7723,0.0547,0.8526
+SSN_Model3,5,-149.7375,Exact Gaussian AIC (stats::AIC on full-sample ssn_lm ML/REML fit),0.0685,0.7681,0.0622,0.8108

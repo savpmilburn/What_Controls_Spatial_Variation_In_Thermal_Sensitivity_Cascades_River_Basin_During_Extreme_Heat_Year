@@ -21,6 +21,7 @@ library(readr)
 library(ranger)
 library(iml)
 library(ggplot2)
+library(patchwork)
 library(extrafont)
 loadfonts(quiet = TRUE)
 
@@ -53,12 +54,12 @@ stopifnot("rf_significant_covariates does not have 6 covariates as expected" = l
 
 # Full display names for axis/title labels (not raw variable names).
 covariate_full_names <- c(
-  base_flow_index            = "Base Flow Index",
-  high_cascades_upstream_pct = "High Cascades Geology % (upstream)",
-  veg_height_upstream_m      = "Vegetation Height (upstream)",
+  base_flow_index            = "Base flow index (BFI)",
+  high_cascades_upstream_pct = "High Cascades geology % (upstream)",
+  veg_height_upstream_m      = "Vegetation height (upstream)",
   elevation_m                = "Elevation",
-  developed_upstream_pct     = "Developed Land Area % (upstream)",
-  agricultural_upstream_pct  = "Agricultural Land Area % (upstream)"
+  developed_upstream_pct     = "Developed land area % (upstream)",
+  agricultural_upstream_pct  = "Agricultural land area % (upstream)"
 )
 
 # Background colors for each covariate.
@@ -75,11 +76,9 @@ covariate_colors <- c(
 pct_covariates <- c("high_cascades_upstream_pct", "developed_upstream_pct", "agricultural_upstream_pct")
 
 GRID_SIZE <- 20
-
-# ============================================================
-# iml Predictor wrapper for ranger. ranger's predict() returns a list with $predictions,
-# not a plain vector; iml needs a function returning a plain numeric vector/data.frame.
-# ============================================================
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# iml Predictor wrapper for ranger. ranger's predict() returns a list with $predictions, not a plain vector.
+# iml needs a function returning a plain numeric vector/data.frame.
 predict_function <- function(model, newdata) {
   predict(model, data = newdata)$predictions
 }
@@ -118,12 +117,11 @@ print(ale_results_significant)
 
 dir.create("results_2021/rf/ale", recursive = TRUE, showWarnings = FALSE)
 write_csv(ale_results_significant, "results_2021/rf/ale/ale_results_significant.csv")
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Plotting: ALE curve plus a data-density rug (full, untrimmed observed values, scaled to match the display axis).
+cat("[CHECK 3] Generating individual panels...\n")
 
-# ============================================================
-# Plotting: ALE curve plus a data-density rug (full, untrimmed observed values, scaled to
-# match the display axis).
-# ============================================================
-cat("[CHECK 3] Generating plots...\n")
+panel_plots <- list()
 
 for (cov in rf_significant_covariates) {
   df <- ale_results_list[[cov]]
@@ -133,27 +131,53 @@ for (cov in rf_significant_covariates) {
   rug_values <- if (cov %in% pct_covariates) rfData[[cov]] * 100 else rfData[[cov]]
   rug_df <- data.frame(display_value = rug_values)
 
+  tag_pos <- if (cov == "agricultural_upstream_pct") c(0.05, 0.94) else c(0.05, 0.97)
+  
   p <- ggplot(df, aes(x = grid_value_display, y = ale_value)) +
     geom_line(color = "black", linewidth = 1) +
     geom_hline(yintercept = 0, color = "grey60", linewidth = 0.4, linetype = "dashed") +
     geom_rug(data = rug_df, aes(x = display_value), inherit.aes = FALSE, sides = "b", color = "grey50", alpha = 0.5) +
     labs(
-      title = paste("Accumulated local effects:", full_name),
       x = full_name,
-      y = "ALE (centered effect on predicted thermal sensitivity)"
+      y = "ALE (centered effect)"
     ) +
     theme_minimal(base_family = "Verdana", base_size = 12) +
     theme(
       panel.background = element_rect(fill = bg_color, color = NA),
-      plot.background = element_rect(fill = bg_color, color = NA),
+      plot.background = element_rect(fill = bg_color, color = "white", linewidth = 6),
       panel.grid.minor = element_blank(),
-      plot.title = element_text(face = "bold", hjust = 0.5)
+      plot.margin = margin(t = 8, r = 10, b = 8, l = 8),
+      axis.title = element_text(face = "bold"),
+      plot.tag = element_text(face = "bold", size = 14),
+      plot.tag.position = tag_pos
     )
 
-  print(p)
+  panel_letter <- letters[which(rf_significant_covariates == cov)]
+
+  p <- p + labs(tag = paste0("(", panel_letter, ")"))
+
+  panel_plots[[cov]] <- p
+
   ggsave(paste0("results_2021/rf/ale/ale_", cov, ".png"),
          plot = p, width = 6, height = 4.5, dpi = 300, bg = bg_color)
 }
 
-cat(sprintf("\nDone. Saved %d ALE plots to results_2021/rf/ale/\n", length(rf_significant_covariates)))
-cat("Saved ale_results_significant.csv.\n")
+cat(sprintf("Done. Saved %d individual panel PNGs (300 DPI, backup only).\n", length(rf_significant_covariates)))
+cat("Saved ale_results_significant6.csv.\n")
+#----------------------------------------------------------------------------------------------------------------------------------------------------------------
+# Figure 3: ALE plots for 6 significant covariates (a-f), combined into a single figure (3 rows x 2 columns).
+# (a) base_flow_index, (b) high_cascades_upstream_pct, (c) veg_height_upstream_m,
+# (d) elevation_m, (e) developed_upstream_pct, (f) agricultural_upstream_pct.
+cat("[CHECK 4] Assembling combined Figure 3 (3x2, panels a-f)...\n")
+
+figure3_combined <- wrap_plots(panel_plots, ncol = 2, nrow = 3) +
+  plot_annotation(
+    theme = theme(plot.background = element_rect(fill = "white", color = NA))
+  )
+
+ggsave(
+  "results_2021/rf/ale/Figure_3_ALE_combined.png",
+  plot = figure3_combined,
+  width = 12, height = 13.5, dpi = 600, bg = "white"
+)
+cat("Saved Figure_3_ALE_combined.png (600 DPI, 12 x 13.5 in).\n")
